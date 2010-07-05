@@ -48,6 +48,10 @@
 #define DRV_VERSION "1.0.8-k0"
 char igbvf_driver_name[] = "igbvf";
 const char igbvf_driver_version[] = DRV_VERSION;
+<<<<<<< HEAD
+=======
+static struct pm_qos_request_list igbvf_driver_pm_qos_req;
+>>>>>>> 82f6825... pm_qos: Get rid of the allocation in pm_qos_add_request()
 static const char igbvf_driver_string[] =
 				"Intel(R) Virtual Function Network Driver";
 static const char igbvf_copyright[] =
@@ -2847,6 +2851,11 @@ static int __init igbvf_init_module(void)
 	printk(KERN_INFO "%s\n", igbvf_copyright);
 
 	ret = pci_register_driver(&igbvf_driver);
+<<<<<<< HEAD
+=======
+	pm_qos_add_request(&igbvf_driver_pm_qos_req, PM_QOS_CPU_DMA_LATENCY,
+			   PM_QOS_DEFAULT_VALUE);
+>>>>>>> 82f6825... pm_qos: Get rid of the allocation in pm_qos_add_request()
 
 	return ret;
 }
@@ -2861,6 +2870,10 @@ module_init(igbvf_init_module);
 static void __exit igbvf_exit_module(void)
 {
 	pci_unregister_driver(&igbvf_driver);
+<<<<<<< HEAD
+=======
+	pm_qos_remove_request(&igbvf_driver_pm_qos_req);
+>>>>>>> 82f6825... pm_qos: Get rid of the allocation in pm_qos_add_request()
 }
 module_exit(igbvf_exit_module);
 

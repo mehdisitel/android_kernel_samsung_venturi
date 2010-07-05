@@ -240,7 +240,6 @@ EXPORT_SYMBOL_GPL(pm_qos_request_active);
  * handle.  Caller needs to save this handle for later use in updates and
  * removal.
  */
-
 void pm_qos_add_request(struct pm_qos_request_list *dep,
 			int pm_qos_class, s32 value)
 {

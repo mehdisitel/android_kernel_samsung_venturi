@@ -174,7 +174,11 @@ that only one external action is invoked at a time.
 #define DRV_DESCRIPTION	"Intel(R) PRO/Wireless 2100 Network Driver"
 #define DRV_COPYRIGHT	"Copyright(c) 2003-2006 Intel Corporation"
 
+<<<<<<< HEAD
 static struct pm_qos_request_list ipw2100_pm_qos_req;
+=======
+struct pm_qos_request_list ipw2100_pm_qos_req;
+>>>>>>> 82f6825... pm_qos: Get rid of the allocation in pm_qos_add_request()
 
 /* Debugging stuff */
 #ifdef CONFIG_IPW2100_DEBUG
@@ -6654,6 +6658,11 @@ static int __init ipw2100_init(void)
 	if (ret)
 		goto out;
 
+<<<<<<< HEAD
+=======
+	pm_qos_add_request(&ipw2100_pm_qos_req, PM_QOS_CPU_DMA_LATENCY,
+			   PM_QOS_DEFAULT_VALUE);
+>>>>>>> 82f6825... pm_qos: Get rid of the allocation in pm_qos_add_request()
 #ifdef CONFIG_IPW2100_DEBUG
 	ipw2100_debug_level = debug;
 	ret = driver_create_file(&ipw2100_pci_driver.driver,
