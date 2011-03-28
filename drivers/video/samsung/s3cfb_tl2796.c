@@ -393,14 +393,7 @@ void tl2796_early_suspend(struct early_suspend *h)
 
 	tl2796_ldi_disable(lcd);
 
-	return ;
-}
-void tl2796_late_resume(struct early_suspend *h)
-{
-	struct s5p_lcd *lcd = container_of(h, struct s5p_lcd,
-								early_suspend);
-
-	tl2796_ldi_enable(lcd);
+	tl2796_parallel_setup_gpios(lcd, false);
 
 	return ;
 }
