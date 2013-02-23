@@ -366,4 +366,12 @@ extern void lcd_cfg_gpio_early_suspend(void);
 extern void lcd_cfg_gpio_late_resume(void);
 #endif
 
+#if defined(CONFIG_FB_S3C_HX8369)
+extern void hx8369_ldi_init(void);
+extern void hx8369_ldi_enable(void);
+extern void hx8369_ldi_disable(void);
+extern void lcd_cfg_gpio_early_suspend(void);
+extern void lcd_cfg_gpio_late_resume(void);
+#endif
+
 #endif /* _S3CFB_H */
