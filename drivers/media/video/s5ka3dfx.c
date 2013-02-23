@@ -1144,9 +1144,9 @@ static int s5ka3dfx_probe(struct i2c_client *client,
 	struct v4l2_subdev *sd;
 	struct s5ka3dfx_platform_data *pdata = client->dev.platform_data;
 
-	state = kzalloc(sizeof(struct s5ka3dfx_state), GFP_KERNEL);
-	if (state == NULL)
-		return -ENOMEM;
+	//state = kzalloc(sizeof(struct s5ka3dfx_state), GFP_KERNEL);
+	//if (state == NULL)
+	//	return -ENOMEM;
 
 	sd = &state->sd;
 	strcpy(sd->name, S5KA3DFX_DRIVER_NAME);
