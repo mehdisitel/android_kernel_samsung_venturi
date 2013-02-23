@@ -29,6 +29,7 @@
 #include <linux/io.h>
 #include <linux/memory.h>
 #include <linux/cpufreq.h>
+#include <mach/regs-clock.h>
 #include <plat/clock.h>
 #include <plat/cpu-freq.h>
 #include <plat/media.h>
