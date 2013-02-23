@@ -4463,8 +4463,8 @@ static struct platform_device *aries_devices[] __initdata = {
 #endif
 #ifdef CONFIG_VIDEO_TV20
         &s5p_device_tvout,
-        &s5p_device_hpd,
-        &s5p_device_cec,
+        //&s5p_device_hpd,
+        //&s5p_device_cec,
 #endif
 	&sec_device_battery,
 #if defined(CONFIG_KEYPAD_CYPRESS_TOUCH)
