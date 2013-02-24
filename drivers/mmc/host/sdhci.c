@@ -2063,11 +2063,22 @@ static void sdhci_cmd_irq(struct sdhci_host *host, u32 intmask)
 		return;
 	}
 
-	if (intmask & SDHCI_INT_TIMEOUT)
+	if (intmask & SDHCI_INT_TIMEOUT) {
+		if (host->mmc->card)
+			printk(KERN_ERR "%s: cmd %d command timeout error\n",
+					mmc_hostname(host->mmc), host->cmd->opcode);
+
 		host->cmd->error = -ETIMEDOUT;
+	}
 	else if (intmask & (SDHCI_INT_CRC | SDHCI_INT_END_BIT |
-			SDHCI_INT_INDEX))
+			SDHCI_INT_INDEX)) {
+		printk(KERN_ERR "%s: cmd %d %s error\n",
+                        mmc_hostname(host->mmc),host->cmd->opcode,
+			(intmask & SDHCI_INT_CRC) ? "command crc" :
+			(intmask & SDHCI_INT_END_BIT) ? "command end bit" :
+			"command index error");
 		host->cmd->error = -EILSEQ;
+	}
 
 	if (host->cmd->error) {
 		tasklet_schedule(&host->finish_tasklet);
@@ -2165,15 +2176,21 @@ static void sdhci_data_irq(struct sdhci_host *host, u32 intmask)
 		return;
 	}
 
-	if (intmask & SDHCI_INT_DATA_TIMEOUT)
+	if (intmask & SDHCI_INT_DATA_TIMEOUT) {
+		printk(KERN_ERR "%s: cmd %d data timeout error\n",
+                        mmc_hostname(host->mmc),host->mrq->cmd->opcode);
 		host->data->error = -ETIMEDOUT;
-	else if (intmask & SDHCI_INT_DATA_END_BIT)
+	} else if (intmask & (SDHCI_INT_DATA_CRC | SDHCI_INT_DATA_END_BIT)) {
+		printk(KERN_ERR "%s: cmd %d %s error\n",
+                        mmc_hostname(host->mmc),host->mrq->cmd->opcode,
+			(intmask & SDHCI_INT_DATA_CRC) ? "data crc" :
+			"command end bit");
 		host->data->error = -EILSEQ;
-	else if ((intmask & SDHCI_INT_DATA_CRC) &&
-		SDHCI_GET_CMD(sdhci_readw(host, SDHCI_COMMAND))
-			!= MMC_BUS_TEST_R)
-		host->data->error = -EILSEQ;
-	else if (intmask & SDHCI_INT_ADMA_ERROR) {
+	//else if ((intmask & SDHCI_INT_DATA_CRC) &&
+	//	SDHCI_GET_CMD(sdhci_readw(host, SDHCI_COMMAND))
+	//		!= MMC_BUS_TEST_R)
+	//	host->data->error = -EILSEQ;
+	} else if (intmask & SDHCI_INT_ADMA_ERROR) {
 		printk(KERN_ERR "%s: ADMA error\n", mmc_hostname(host->mmc));
 		sdhci_show_adma_error(host);
 		host->data->error = -EIO;
@@ -2339,6 +2356,9 @@ int sdhci_suspend_host(struct sdhci_host *host, pm_message_t state)
 	if (host->irq)
 		disable_irq(host->irq);
 
+	//if (host->vmmc)
+	//	ret = regulator_disable(host->vmmc);
+
 	if (host->vmmc)
 		ret = regulator_disable(host->vmmc);
 
@@ -2351,6 +2371,12 @@ int sdhci_resume_host(struct sdhci_host *host)
 {
 	int ret = 0;
 	struct mmc_host *mmc = host->mmc;
+
+	//if (host->vmmc) {
+	//	int ret = regulator_enable(host->vmmc);
+	//	if (ret)
+	//		return ret;
+	//}
 
 	if (host->vmmc) {
 		int ret = regulator_enable(host->vmmc);
@@ -2819,7 +2845,17 @@ int sdhci_add_host(struct sdhci_host *host)
 	if (ret)
 		goto untasklet;
 
+/*
 	host->vmmc = regulator_get(mmc_dev(mmc), "vmmc");
+	if (IS_ERR(host->vmmc)) {
+		printk(KERN_INFO "%s: no vmmc regulator found\n", mmc_hostname(mmc));
+		host->vmmc = NULL;
+	} else {
+		regulator_enable(host->vmmc);
+	}
+*/
+
+	host->vmmc = regulator_get(mmc_dev(mmc), "vtf");
 	if (IS_ERR(host->vmmc)) {
 		printk(KERN_INFO "%s: no vmmc regulator found\n", mmc_hostname(mmc));
 		host->vmmc = NULL;
@@ -2913,6 +2949,11 @@ void sdhci_remove_host(struct sdhci_host *host, int dead)
 
 	tasklet_kill(&host->card_tasklet);
 	tasklet_kill(&host->finish_tasklet);
+
+	//if (host->vmmc) {
+	//	regulator_disable(host->vmmc);
+	//	regulator_put(host->vmmc);
+	//}
 
 	if (host->vmmc) {
 		regulator_disable(host->vmmc);
