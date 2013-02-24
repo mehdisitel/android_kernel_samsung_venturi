@@ -70,6 +70,11 @@
 #include <mach/media.h>
 #endif
 
+#ifdef CONFIG_S5PV210_POWER_DOMAIN
+#include <mach/power-domain.h>
+#endif
+#include <mach/cpu-freq-v210.h>
+
 
 #ifdef CONFIG_SENSORS_BMA222
 #include <linux/i2c/bma023_dev.h>
@@ -3866,6 +3871,37 @@ static void __init android_pmem_set_platdata(void)
 }
 #endif
 
+#ifdef CONFIG_CPU_FREQ
+static struct s5pv210_cpufreq_voltage smdkc110_cpufreq_volt[] = {
+	{
+		.freq	= 1000000,
+		.varm	= 1275000,
+		.vint	= 1100000,
+	}, {
+		.freq	=  800000,
+		.varm	= 1200000,
+		.vint	= 1100000,
+	}, {
+		.freq	=  400000,
+		.varm	= 1050000,
+		.vint	= 1100000,
+	}, {
+		.freq	=  200000,
+		.varm	=  950000,
+		.vint	= 1100000,
+	}, {
+		.freq	=  100000,
+		.varm	=  950000,
+		.vint	= 1000000,
+	},
+};
+
+static struct s5pv210_cpufreq_data smdkc110_cpufreq_plat = {
+	.volt	= smdkc110_cpufreq_volt,
+	.size	= ARRAY_SIZE(smdkc110_cpufreq_volt),
+};
+#endif
+
 static bool sec_bat_get_jig_status(void)
 {
 	return jig_status;
@@ -4494,6 +4530,10 @@ static struct platform_device *aries_devices[] __initdata = {
 	&s3c_device_timer[3],
 #endif
 
+#ifdef CONFIG_CPU_FREQ
+	&s5pv210_device_cpufreq,
+#endif
+
 // VenturiGB_Usys_jypark 2011.08.08 - DMB [[
 #ifdef CONFIG_S3C64XX_DEV_SPI
  &s5pv210_device_spi0,
@@ -4792,6 +4832,10 @@ static void __init aries_machine_init(void)
 #endif
 #ifdef CONFIG_S5PV210_SETUP_SDHCI
 	s3c_sdhci_set_platdata();
+#endif
+
+#ifdef CONFIG_CPU_FREQ
+	s5pv210_cpufreq_set_platdata(&smdkc110_cpufreq_plat);
 #endif
 
 	regulator_has_full_constraints();
