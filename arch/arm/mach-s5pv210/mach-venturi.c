@@ -986,7 +986,7 @@ static void hx8369_cfg_gpio(struct platform_device *pdev)
 	}
 
 	/* mDNIe SEL: why we shall write 0x2 ? */
-#ifdef CONFIG_FB_S3C_VENTURI_MDNIE
+#ifdef CONFIG_FB_S3C_MDNIE
 	writel(0x1, S5P_MDNIE_SEL);
 #else
 	writel(0x2, S5P_MDNIE_SEL);
