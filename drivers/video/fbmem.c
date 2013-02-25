@@ -35,6 +35,9 @@
 
 #include <asm/fb.h>
 
+#ifdef CONFIG_FB_S3C
+#include <samsung/s3cfb.h>
+#endif
 
     /*
      *  Frame buffer device initialization and setup routines
@@ -1169,6 +1172,10 @@ static long do_fb_ioctl(struct fb_info *info, unsigned int cmd,
 		unlock_fb_info(info);
 		break;
 	default:
+// Skip mutex for vsync poll because it's in its own thread
+#ifdef CONFIG_FB_S3C
+		if (cmd != S3CFB_WAIT_FOR_VSYNC)
+#endif
 		if (!lock_fb_info(info))
 			return -ENODEV;
 		fb = info->fbops;
@@ -1176,6 +1183,9 @@ static long do_fb_ioctl(struct fb_info *info, unsigned int cmd,
 			ret = fb->fb_ioctl(info, cmd, arg);
 		else
 			ret = -ENOTTY;
+#ifdef CONFIG_FB_S3C
+		if (cmd != S3CFB_WAIT_FOR_VSYNC)
+#endif
 		unlock_fb_info(info);
 	}
 	return ret;
@@ -1651,6 +1661,7 @@ static int do_unregister_framebuffer(struct fb_info *fb_info)
 	if (ret)
 		return -EINVAL;
 
+	unlink_framebuffer(fb_info);
 	if (fb_info->pixmap.addr &&
 	    (fb_info->pixmap.flags & FB_PIXMAP_DEFAULT))
 		kfree(fb_info->pixmap.addr);
@@ -1658,7 +1669,6 @@ static int do_unregister_framebuffer(struct fb_info *fb_info)
 	registered_fb[i] = NULL;
 	num_registered_fb--;
 	fb_cleanup_device(fb_info);
-	device_destroy(fb_class, MKDEV(FB_MAJOR, i));
 	event.info = fb_info;
 	fb_notifier_call_chain(FB_EVENT_FB_UNREGISTERED, &event);
 
@@ -1666,6 +1676,22 @@ static int do_unregister_framebuffer(struct fb_info *fb_info)
 	put_fb_info(fb_info);
 	return 0;
 }
+
+int unlink_framebuffer(struct fb_info *fb_info)
+{
+	int i;
+
+	i = fb_info->node;
+	if (i < 0 || i >= FB_MAX || registered_fb[i] != fb_info)
+		return -EINVAL;
+
+	if (fb_info->dev) {
+		device_destroy(fb_class, MKDEV(FB_MAJOR, i));
+		fb_info->dev = NULL;
+	}
+	return 0;
+}
+EXPORT_SYMBOL(unlink_framebuffer);
 
 void remove_conflicting_framebuffers(struct apertures_struct *a,
 				     const char *name, bool primary)
@@ -1738,8 +1764,6 @@ void fb_set_suspend(struct fb_info *info, int state)
 {
 	struct fb_event event;
 
-	if (!lock_fb_info(info))
-		return;
 	event.info = info;
 	if (state) {
 		fb_notifier_call_chain(FB_EVENT_SUSPEND, &event);
@@ -1748,7 +1772,6 @@ void fb_set_suspend(struct fb_info *info, int state)
 		info->state = FBINFO_STATE_RUNNING;
 		fb_notifier_call_chain(FB_EVENT_RESUME, &event);
 	}
-	unlock_fb_info(info);
 }
 
 /**

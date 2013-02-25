@@ -46,6 +46,9 @@
 #include <mach/param.h>
 #include <mach/system.h>
 #include <mach/sec_switch.h>
+#ifdef CONFIG_SAMSUNG_FASCINATE
+#include <mach/regs-gpio.h>
+#endif
 
 #include <linux/usb/gadget.h>
 #include <linux/fsa9480.h>
@@ -68,8 +71,9 @@
 #include <mach/cpu-freq-v210.h>
 
 #include <media/ce147_platform.h>
+#ifdef CONFIG_VIDEO_S5KA3DFX
 #include <media/s5ka3dfx_platform.h>
-#include <media/s5k4ecgx.h>
+#endif
 
 #include <plat/regs-serial.h>
 #include <plat/s5pv210.h>
@@ -409,6 +413,10 @@ static struct s5p_media_device aries_media_devs[] = {
 #ifdef CONFIG_CPU_FREQ
 static struct s5pv210_cpufreq_voltage smdkc110_cpufreq_volt[] = {
 	{
+		.freq	= 1200000,
+		.varm	= 1275000,
+		.vint	= 1100000,
+	}, {
 		.freq	= 1000000,
 		.varm	= 1275000,
 		.vint	= 1100000,
@@ -1287,6 +1295,18 @@ static struct platform_device s3c_device_i2c13 = {
   };
 #endif
 
+#ifdef CONFIG_SAMSUNG_FASCINATE
+void touch_key_set_int_flt(unsigned long width)
+{
+	writel(readl(S5PV210_GPJ4_INT_FLTCON0) |
+		(1 << 15) |     // enable bit
+		(width << 8),   // max width = 0x2f
+		S5PV210_GPJ4_INT_FLTCON0);
+}
+
+const unsigned long touch_int_flt_width = 0x2f;   // arbitrary value - max is 0x2f
+#endif
+
 static void touch_keypad_gpio_init(void)
 {
 	int ret = 0;
@@ -1294,6 +1314,10 @@ static void touch_keypad_gpio_init(void)
 	ret = gpio_request(_3_GPIO_TOUCH_EN, "TOUCH_EN");
 	if (ret)
 		printk(KERN_ERR "Failed to request gpio touch_en.\n");
+
+#ifdef CONFIG_SAMSUNG_FASCINATE
+	touch_key_set_int_flt(touch_int_flt_width);
+#endif
 }
 
 static void touch_keypad_onoff(int onoff)
@@ -2330,7 +2354,9 @@ static struct s3c_platform_fimc fimc_plat_lsi = {
 	.default_cam	= CAMERA_PAR_A,
 	.camera		= {
 		&ce147,
+#ifdef CONFIG_VIDEO_S5KA3DFX
 		&s5ka3dfx,
+#endif
 	},
 	.hw_ver		= 0x43,
 };
@@ -2520,6 +2546,10 @@ static void fsa9480_cardock_cb(bool attached)
 		switch_set_state(&switch_dock, 2);
 	else
 		switch_set_state(&switch_dock, 0);
+
+	set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
+	if (charger_callbacks && charger_callbacks->set_cable)
+		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 }
 
 static void fsa9480_reset_cb(void)
@@ -2616,14 +2646,6 @@ static void gp2a_gpio_init(void)
 	int ret = gpio_request(GPIO_PS_ON, "gp2a_power_supply_on");
 	if (ret)
 		printk(KERN_ERR "Failed to request gpio gp2a power supply.\n");
-
-#ifdef CONFIG_SAMSUNG_FASCINATE
-        s3c_gpio_cfgpin(GPIO_PS_VOUT, S3C_GPIO_SFN(GPIO_PS_VOUT_AF));
-        s3c_gpio_setpull(GPIO_PS_VOUT, S3C_GPIO_PULL_NONE);
-        irq_set_irq_type(IRQ_EINT1, IRQ_TYPE_EDGE_BOTH);
-        gp2a_pdata.p_irq = gpio_to_irq(GPIO_PS_VOUT);
-        gp2a_pdata.p_out = GPIO_PS_VOUT;
-#endif
 }
 
 static struct i2c_board_info i2c_devs11[] __initdata = {
@@ -3342,17 +3364,33 @@ static struct gpio_init_data aries_init_gpios[] = {
 
 	// GPG3 ----------------------------
 	{
+#if defined(CONFIG_SAMSUNG_VIBRANT)
+		.num	= S5PV210_GPG3(0), // GPIO_GPS_nRST
+		.cfg	= S3C_GPIO_INPUT,
+		.val	= S3C_GPIO_SETPIN_NONE,
+		.pud	= S3C_GPIO_PULL_DOWN,
+		.drv	= S3C_GPIO_DRVSTR_1X,
+#else
 		.num	= S5PV210_GPG3(0), // GPIO_GPS_nRST
 		.cfg	= S3C_GPIO_OUTPUT,
 		.val	= S3C_GPIO_SETPIN_ZERO,
 		.pud	= S3C_GPIO_PULL_NONE,
 		.drv	= S3C_GPIO_DRVSTR_1X,
+#endif
 	}, {
+#if defined(CONFIG_SAMSUNG_VIBRANT)
+		.num	= S5PV210_GPG3(1), // GPIO_GPS_PWR_EN
+		.cfg	= S3C_GPIO_INPUT,
+		.val	= S3C_GPIO_SETPIN_NONE,
+		.pud	= S3C_GPIO_PULL_DOWN,
+		.drv	= S3C_GPIO_DRVSTR_1X,
+#else
 		.num	= S5PV210_GPG3(1), // GPIO_GPS_PWR_EN
 		.cfg	= S3C_GPIO_OUTPUT,
 		.val	= S3C_GPIO_SETPIN_ZERO,
 		.pud	= S3C_GPIO_PULL_NONE,
 		.drv	= S3C_GPIO_DRVSTR_1X,
+#endif
 	}, {
 #if defined(CONFIG_SAMSUNG_GALAXYSB)
 		.num	= S5PV210_GPG3(2), // GPIO_GPS_nRST
@@ -4138,7 +4176,7 @@ void s3c_config_gpio_table(void)
 		}
 	}
 #ifdef CONFIG_SAMSUNG_FASCINATE
-	s3c_gpio_set_drvstrength(S5PV210_GPH3(7), S3C_GPIO_DRVSTR_2X); 
+	s3c_gpio_set_drvstrength(S5PV210_GPH3(7), S3C_GPIO_DRVSTR_4X);
 #endif
 }
 
