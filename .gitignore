@@ -92,5 +92,6 @@ GTAGS
 \#*#
 _t32
 _tool
+kernel/usr/initramfs/
 
 Module.symvers
