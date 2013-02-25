@@ -240,7 +240,6 @@ struct s3cfb_global {
 	enum s3cfb_output_t	output;
 	enum s3cfb_rgb_mode_t	rgb_mode;
 	struct s3cfb_lcd	*lcd;
-	u32			pixclock_hz;
 
 #ifdef CONFIG_HAS_WAKELOCK
 	struct early_suspend	early_suspend;
@@ -358,10 +357,10 @@ extern void s3cfb_late_resume(struct early_suspend *h);
 #endif
 #endif
 
-#if defined(CONFIG_FB_S3C_TL2796)
-extern void tl2796_ldi_init(void);
-extern void tl2796_ldi_enable(void);
-extern void tl2796_ldi_disable(void);
+#if defined(CONFIG_FB_S3C_HX8369)
+extern void hx8369_ldi_init(void);
+extern void hx8369_ldi_enable(void);
+extern void hx8369_ldi_disable(void);
 extern void lcd_cfg_gpio_early_suspend(void);
 extern void lcd_cfg_gpio_late_resume(void);
 #endif

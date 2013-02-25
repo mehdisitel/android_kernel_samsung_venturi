@@ -152,19 +152,6 @@ int s3cfb_frame_off(struct s3cfb_global *ctrl)
 	return 0;
 }
 
-void s3cfb_readjust_pixclock(struct s3cfb_global *ctrl, u32 src_clk, u32 div)
-{
-	struct s3c_platform_fb *pdata = to_fb_plat(ctrl->dev);
-	int i;
-	u32 pixclock;
-
-	pixclock = KHZ2PICOS(src_clk / 1000) * div;
-	dev_info(ctrl->dev, "pixclock adjusted from %d to %d\n",
-		 ctrl->fb[0]->var.pixclock, pixclock);
-	for (i = 0; i < pdata->nr_wins; i++)
-		ctrl->fb[i]->var.pixclock = pixclock;
-}
-
 int s3cfb_set_clock(struct s3cfb_global *ctrl)
 {
 	struct s3c_platform_fb *pdata = to_fb_plat(ctrl->dev);
@@ -175,8 +162,7 @@ int s3cfb_set_clock(struct s3cfb_global *ctrl)
 	/* fixed clock source: hclk */
 	cfg = readl(ctrl->regs + S3C_VIDCON0);
 	cfg &= ~(S3C_VIDCON0_CLKSEL_MASK | S3C_VIDCON0_CLKVALUP_MASK |
-		 S3C_VIDCON0_VCLKEN_MASK | S3C_VIDCON0_CLKDIR_MASK |
-		 S3C_VIDCON0_CLKVAL_F(-1));
+		S3C_VIDCON0_VCLKEN_MASK | S3C_VIDCON0_CLKDIR_MASK);
 	cfg |= (S3C_VIDCON0_CLKVALUP_ALWAYS | S3C_VIDCON0_VCLKEN_NORMAL |
 		S3C_VIDCON0_CLKDIR_DIVIDED);
 
@@ -191,7 +177,7 @@ int s3cfb_set_clock(struct s3cfb_global *ctrl)
 		printk(KERN_INFO "FIMD src hclk = %d\n", src_clk);
 	}
 
-	vclk = ctrl->pixclock_hz;
+	vclk = ctrl->fb[pdata->default_win]->var.pixclock;
 
 	if (vclk > maxclk) {
 		dev_info(ctrl->dev, "vclk(%d) should be smaller than %d\n",
@@ -199,9 +185,15 @@ int s3cfb_set_clock(struct s3cfb_global *ctrl)
 		/* vclk = maxclk; */
 	}
 
+#if defined (CONFIG_MACH_VENTURI)
+	div = src_clk / vclk;  
+	if( (src_clk % vclk) > (vclk / 2) )
+		div++;
+#else
 	div = src_clk / vclk;
 	if (src_clk % vclk)
 		div++;
+#endif
 
 	if ((src_clk/div) > maxclk)
 		dev_info(ctrl->dev, "vclk(%d) should be smaller than %d Hz\n",
@@ -213,7 +205,6 @@ int s3cfb_set_clock(struct s3cfb_global *ctrl)
 	dev_dbg(ctrl->dev, "parent clock: %d, vclk: %d, vclk div: %d\n",
 			src_clk, vclk, div);
 
-	s3cfb_readjust_pixclock(ctrl, src_clk, div);
 	return 0;
 }
 
