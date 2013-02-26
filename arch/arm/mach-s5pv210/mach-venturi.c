@@ -3600,7 +3600,7 @@ static void fsa9480_usb_cb(bool attached)
 
 static void fsa9480_charger_cb(bool attached)
 {
-	set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
+	set_cable_status = attached ? CABLE_TYPE_MISC : CABLE_TYPE_NONE;
 	if (charger_callbacks && charger_callbacks->set_cable)
 		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 }
@@ -3650,12 +3650,10 @@ static void fsa9480_reset_cb(void)
 		pr_err("Failed to register dock switch. %d\n", ret);
 }
 
-/*
 static void fsa9480_set_init_flag(void)
 {
 	fsa9480_init_flag = 1;
 }
-*/
 
 static struct fsa9480_platform_data fsa9480_pdata = {
 	.jig_cb = fsa9480_jig_cb,
@@ -3664,7 +3662,7 @@ static struct fsa9480_platform_data fsa9480_pdata = {
 	.deskdock_cb = fsa9480_deskdock_cb,
 	.cardock_cb = fsa9480_cardock_cb,
 	.reset_cb = fsa9480_reset_cb,
-	//.set_init_flag = fsa9480_set_init_flag,
+	.set_init_flag = fsa9480_set_init_flag,
 };
 
 static struct i2c_board_info i2c_devs7[] __initdata = {
@@ -3903,7 +3901,6 @@ struct platform_device sec_device_battery = {
 	.dev.platform_data = &sec_bat_pdata,
 };
 
-/* JPC
 static int sec_switch_get_cable_status(void)
 {
 	return mtp_off_status ? CABLE_TYPE_NONE : set_cable_status;
@@ -3949,7 +3946,6 @@ struct platform_device sec_device_switch = {
 		.platform_data	= &sec_switch_pdata,
 	}
 };
-JPC*/
 
 static struct platform_device sec_device_rfkill = {
 	.name	= "bt_rfkill",
@@ -4485,7 +4481,7 @@ static struct platform_device *aries_devices[] __initdata = {
 #if defined(CONFIG_KEYPAD_CYPRESS_TOUCH)
 	&s3c_device_i2c10,
 #endif
-	//JPC&sec_device_switch,  // samsung switch driver
+	&sec_device_switch,  // samsung switch driver
 
 #ifdef CONFIG_S5PV210_POWER_DOMAIN
 	&s5pv210_pd_audio,

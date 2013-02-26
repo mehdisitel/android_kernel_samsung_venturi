@@ -16,6 +16,7 @@
 #include <linux/init.h>
 #include <linux/delay.h>
 #include <linux/device.h>
+#include <linux/err.h>
 #include <linux/gpio.h>
 #include <linux/platform_device.h>
 #include <linux/slab.h>
@@ -27,7 +28,6 @@
 #include <asm/mach/arch.h>
 #include <mach/param.h>
 #include <mach/gpio.h>
-#include <mach/gpio-p1.h>
 #include <mach/sec_switch.h>
 #include <mach/regs-clock.h>
 #include <mach/regs-gpio.h>
@@ -47,6 +47,11 @@ struct sec_switch_wq {
 /* for sysfs control (/sys/class/sec/switch/) */
 extern struct device *switch_dev;
 
+#define UART_JIG_ON_CONNECTED (1<<2) 
+#define UART_JIG_OFF_CONNECTED (1<<3) 
+
+extern int usb_cable, uart_cable;
+
 static void usb_switch_mode(struct sec_switch_struct *secsw, int mode)
 {
 	if (mode == SWITCH_PDA)	{
@@ -58,7 +63,7 @@ static void usb_switch_mode(struct sec_switch_struct *secsw, int mode)
 		if (secsw->pdata && secsw->pdata->set_vbus_status)
 			secsw->pdata->set_vbus_status((u8)USB_VBUS_CP_ON);
 		mdelay(10);
-		fsa9480_manual_switching(SWITCH_PORT_AUDIO);
+		fsa9480_manual_switching(SWITCH_PORT_VAUDIO);
 	}
 }
 
@@ -169,6 +174,24 @@ static ssize_t disable_vbus_store(struct device *dev, struct device_attribute *a
 	return size;
 }
 
+static ssize_t FactoryTest_switch_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	char tmp = 'D';
+
+	if (uart_cable == UART_JIG_ON_CONNECTED)
+	{
+		tmp = 'E';
+	}
+	return sprintf(buf, "%c\n", tmp);
+}
+
+static ssize_t FactoryTest_switch_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+{
+	return 0;
+}
+
+static DEVICE_ATTR(FactoryTest, 0664, FactoryTest_switch_show, FactoryTest_switch_store);
+
 static DEVICE_ATTR(uart_sel,     0664, uart_sel_show,     uart_sel_store);
 static DEVICE_ATTR(usb_sel,      0664, usb_sel_show,      usb_sel_store);
 static DEVICE_ATTR(usb_state,    0664, usb_state_show,    usb_state_store);
@@ -246,6 +269,9 @@ static int sec_switch_probe(struct platform_device *pdev)
 
 	if (device_create_file(switch_dev, &dev_attr_disable_vbus) < 0)
 		pr_err("Failed to create device file(%s)!\n", dev_attr_usb_state.attr.name);
+
+	if (device_create_file(switch_dev, &dev_attr_FactoryTest) < 0)
+		pr_err("Failed to create device file(%s)!\n", dev_attr_FactoryTest.attr.name);
 
 	/* run work queue */
 	wq = kmalloc(sizeof(struct sec_switch_wq), GFP_ATOMIC);

@@ -68,6 +68,7 @@ enum cable_type_t {
 	CABLE_TYPE_NONE = 0,
 	CABLE_TYPE_USB,
 	CABLE_TYPE_AC,
+	CABLE_TYPE_MISC,
 };
 
 /**
@@ -82,6 +83,8 @@ struct max8998_adc_table_data {
 struct max8998_charger_callbacks {
 	void (*set_cable)(struct max8998_charger_callbacks *ptr,
 		enum cable_type_t status);
+	bool (*set_esafe)(struct max8998_charger_callbacks *ptr, u8 esafe);
+	bool (*get_vdcin)(struct max8998_charger_callbacks *ptr);
 };
 
 /**

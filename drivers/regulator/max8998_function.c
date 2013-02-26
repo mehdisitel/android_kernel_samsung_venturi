@@ -3012,6 +3012,7 @@ unsigned int max8998_poweron_reason(void)
 
 }
 
+//fix me plx jackpot!
 #if defined(CONFIG_MACH_VENTURI)
 int  FSA9480_PMIC_CP_USB(void)
 {
@@ -3025,7 +3026,7 @@ int  FSA9480_PMIC_CP_USB(void)
 
 	usb_sel = switch_sel & (int)(USB_SEL_MASK);
 
-	return usb_sel;
+	return 1;
 }
 #endif
 

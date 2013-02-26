@@ -1898,7 +1898,7 @@ void s3c_cable_changed(bool connected)
 
 	s3c_bat_info.cable_status = s3c_bat_info.pdata->cable_cb();
 	
-	if (s3c_bat_info.cable_status == CABLE_TYPE_USB) {
+	if (s3c_bat_info.cable_status == CABLE_TYPE_MISC) {
 		if (connected)
 			s3c_bat_info.cable_status = CABLE_TYPE_USB;
 		else
@@ -3328,8 +3328,8 @@ static int __devinit s3c_bat_probe(struct platform_device *pdev)
 	}
 
 	s3c_bat_info.callbacks.set_cable = s3c_set_cable_cb;
-	//s3c_bat_info.callbacks.set_esafe = NULL;
-	//s3c_bat_info.callbacks.get_vdcin = NULL;
+	s3c_bat_info.callbacks.set_esafe = NULL;
+	s3c_bat_info.callbacks.get_vdcin = NULL;
 	if (s3c_bat_info.pdata->register_callbacks)
 		s3c_bat_info.pdata->register_callbacks(&s3c_bat_info.callbacks);
 
