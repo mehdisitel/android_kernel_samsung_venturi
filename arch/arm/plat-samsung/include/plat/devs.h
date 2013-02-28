@@ -241,6 +241,10 @@ extern struct platform_device s3c_device_ac97;
 
 #endif
 
+#ifdef CONFIG_SND_S5P_RP
+extern struct platform_device s5p_device_rp;
+#endif
+
 /**
  * s3c_set_platdata() - helper for setting platform data
  * @pd: The default platform data for this device.
