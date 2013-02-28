@@ -4096,7 +4096,7 @@ static void aries_power_off(void)
 
 	while (1) {
 		/* Check reboot charging */
-		//if (maxim_chg_status()) {
+		if (maxim_chg_status()) {
 			/* watchdog reset */
 			pr_info("%s: charger connected, rebooting\n", __func__);
 			mode = REBOOT_MODE_CHARGING;
@@ -4107,7 +4107,7 @@ static void aries_power_off(void)
 			arch_reset('r', NULL);
 			pr_crit("%s: waiting for reset!\n", __func__);
 			while (1);
-		//}
+		}
 
 		//kernel_sec_clear_upload_magic_number();
 		/* wait for power button release */
