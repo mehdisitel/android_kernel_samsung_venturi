@@ -1038,6 +1038,12 @@ config VIDEO_CE147
         ---help---
           This driver supports CE147 SoC camera module
 
+config VIDEO_S5K5CCGX
+	tristate "S5K5CCGX Camera Sensor"
+	depends on I2C && VIDEO_V4L2
+	---help---
+	This driver supports 5M SoC S5K5CCGX Camera module
+
 config VIDEO_S5KA3DFX
         tristate "S5KA3DFX Camera Sensor"
         depends on I2C && VIDEO_V4L2
