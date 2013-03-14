@@ -390,6 +390,8 @@ config SND_SOC_WM2000
 config SND_SOC_WM9090
 	tristate
 
+source "sound/soc/codecs/mc1n2/Kconfig"
+
 menuconfig SND_WM8994_EXTENSIONS
 	bool "WM8994 Extensions"
 	depends on SND_SOC_SAMSUNG_HERRING_WM8994

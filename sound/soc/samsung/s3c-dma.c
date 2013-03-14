@@ -32,6 +32,8 @@
 
 #include "s3c-dma.h"
 
+#define NEW_DMA
+
 static const struct snd_pcm_hardware s3c_dma_hardware = {
 	.info			= SNDRV_PCM_INFO_INTERLEAVED |
 				    SNDRV_PCM_INFO_BLOCK_TRANSFER |
@@ -87,6 +89,15 @@ static void s3c_dma_enqueue(struct snd_pcm_substream *substream)
 	pr_debug("%s: loaded %d, limit %d\n",
 				__func__, prtd->dma_loaded, limit);
 
+#ifdef NEW_DMA
+	ret = s3c2410_dma_enqueue_autoload (prtd->params->channel,
+		substream, pos, prtd->dma_period, limit);
+	if (ret == 0) {
+		prtd->dma_loaded += limit;
+		pos += prtd->dma_period;
+	}
+#else
+
 	while (prtd->dma_loaded < limit) {
 		unsigned long len = prtd->dma_period;
 
@@ -110,6 +121,7 @@ static void s3c_dma_enqueue(struct snd_pcm_substream *substream)
 			break;
 	}
 
+#endif
 	prtd->dma_pos = pos;
 }
 
@@ -133,7 +145,9 @@ static void s3c24xx_audio_buffdone(struct s3c2410_dma_chan *channel,
 	spin_lock(&prtd->lock);
 	if (prtd->state & ST_RUNNING && !s3c_dma_has_circular()) {
 		prtd->dma_loaded--;
+#ifndef NEW_DMA
 		s3c_dma_enqueue(substream);
+#endif
 	}
 
 	spin_unlock(&prtd->lock);
@@ -448,7 +462,7 @@ static int s3c_dma_new(struct snd_card *card,
 		card->dev->dma_mask = &s3c_dma_mask;
 	if (!card->dev->coherent_dma_mask)
 		card->dev->coherent_dma_mask = 0xffffffff;
-#ifndef CONFIG_S5P_INTERNAL_DMA
+#if !defined(CONFIG_S5P_INTERNAL_DMA) || defined(CONFIG_SND_S5P_RP)
 	if (dai->driver->playback.channels_min) {
 		ret = s3c_preallocate_dma_buffer(pcm,
 			SNDRV_PCM_STREAM_PLAYBACK);

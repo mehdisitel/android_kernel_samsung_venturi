@@ -46,6 +46,11 @@
 
 #define S3C2412_I2S_DEBUG_CON 0
 
+#ifdef CONFIG_SND_S5P_RP
+/* s5p_rp_is_running is from s5p_rp driver */
+extern volatile int s5p_rp_is_running;
+#endif
+
 static inline struct s3c_i2sv2_info *to_info(struct snd_soc_dai *cpu_dai)
 {
 	return snd_soc_dai_get_drvdata(cpu_dai);
@@ -125,19 +130,42 @@ static void s3c2412_snd_txctrl(struct s3c_i2sv2_info *i2s, int on)
 		 * to disable the DMA and TX without resetting the FIFOS.
 		 */
 
+#ifdef CONFIG_SND_S5P_RP
+		if (!s5p_rp_is_running) {	/* Check RP is running */
+			con |=  S3C2412_IISCON_TXDMA_PAUSE;
+			con |=  S3C2412_IISCON_TXCH_PAUSE;
+			con &= ~S3C2412_IISCON_TXDMA_ACTIVE;
+		}
+#else
 		con |=  S3C2412_IISCON_TXDMA_PAUSE;
 		con |=  S3C2412_IISCON_TXCH_PAUSE;
 		con &= ~S3C2412_IISCON_TXDMA_ACTIVE;
+#endif
 
 		switch (mod & S3C2412_IISMOD_MODE_MASK) {
 		case S3C2412_IISMOD_MODE_TXRX:
+#ifdef CONFIG_SND_S5P_RP
+			if (!s5p_rp_is_running) {	/* Check RP is running */
+				mod &= ~S3C2412_IISMOD_MODE_MASK;
+				mod |= S3C2412_IISMOD_MODE_RXONLY;
+			}
+#else
 			mod &= ~S3C2412_IISMOD_MODE_MASK;
 			mod |= S3C2412_IISMOD_MODE_RXONLY;
+#endif
+
 			break;
 
 		case S3C2412_IISMOD_MODE_TXONLY:
+#ifdef CONFIG_SND_S5P_RP
+			if (!s5p_rp_is_running) {	/* Check RP is running */
+				mod &= ~S3C2412_IISMOD_MODE_MASK;
+				con &= ~S3C2412_IISCON_IIS_ACTIVE;
+			}
+#else
 			mod &= ~S3C2412_IISMOD_MODE_MASK;
 			con &= ~S3C2412_IISCON_IIS_ACTIVE;
+#endif
 			break;
 
 		default:

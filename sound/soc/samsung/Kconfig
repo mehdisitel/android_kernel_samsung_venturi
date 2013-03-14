@@ -30,6 +30,12 @@ config SND_SAMSUNG_AC97
 	tristate
 	select SND_SOC_AC97_BUS
 
+config SND_SMDKC110_MC1N2
+        tristate "SoC I2S Audio support for MC1N2"
+        depends on SND_S3C24XX_SOC
+        select SND_S5PC1XX_SOC_I2S
+	select SND_SOC_MC1N2
+
 config SND_SAMSUNG_SPDIF
 	tristate
 	select SND_SOC_SPDIF

@@ -1092,6 +1092,10 @@ static void dapm_post_sequence_async(void *data, async_cookie_t cookie)
 	}
 }
 
+#ifdef CONFIG_SND_S5P_RP
+extern volatile int s5p_rp_is_running;
+#endif
+
 /*
  * Scan each dapm widget for complete audio path.
  * A complete path is a route that has valid endpoints i.e.:-
@@ -1202,7 +1206,10 @@ static int dapm_power_widgets(struct snd_soc_dapm_context *dapm, int event)
 	async_synchronize_full_domain(&async_domain);
 
 	/* Power down widgets first; try to avoid amplifying pops. */
-	dapm_seq_run(dapm, &down_list, event, false);
+#ifdef CONFIG_SND_S5P_RP
+        if (!s5p_rp_is_running)
+#endif  
+		dapm_seq_run(dapm, &down_list, event, false);
 
 	dapm_widget_update(dapm);
 

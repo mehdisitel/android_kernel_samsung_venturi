@@ -515,18 +515,78 @@ static int s3c_idma_pcm_new(struct snd_card *card,
 	return ret;
 }
 
-struct snd_soc_platform_driver idma_soc_platform = {
-	.ops = &s3c_idma_ops,
-	.pcm_new = s3c_idma_pcm_new,
-	.pcm_free = s3c_idma_pcm_free,
-};
-EXPORT_SYMBOL_GPL(idma_soc_platform);
+#ifdef CONFIG_SND_S5P_RP
+void s5p_i2s_idma_enable(unsigned long frame_size_bytes)
+{
+	u32 iisahb, iismod;
+	pr_debug("%s(): Frame Size = %lu Bytes\n", __FUNCTION__, frame_size_bytes);
+
+	iismod  = readl(s3c_idma.regs + S3C2412_IISMOD);
+	iismod |= S5P_IISMOD_TXSLP;
+	writel(iismod, s3c_idma.regs + S3C2412_IISMOD);
+
+	iisahb  = readl(s3c_idma.regs + S5P_IISAHB);
+	iisahb |= S5P_IISAHB_DMA_STRADDRRST | S5P_IISAHB_DMA_STRADDRTOG
+			| S5P_IISAHB_DMARLD | S5P_IISAHB_DISRLDINT
+			| S5P_IISAHB_DMACLR;
+
+	/* OBUF Address / Size */
+	writel(0xEEC00000, s3c_idma.regs + S5P_IISSTR);		/* OBUF0 */
+	writel(0xEED00000, s3c_idma.regs + S5P_IISSTR1);	/* OBUF1 */
+	writel(((frame_size_bytes >> 2) & S5P_IISSIZE_TRNMSK) << S5P_IISSIZE_SHIFT,
+		s3c_idma.regs + S5P_IISSIZE);
+
+	writel(iisahb, s3c_idma.regs + S5P_IISAHB);
+
+	/* Enable DMA */
+	iisahb |= S5P_IISAHB_DMAEN;
+	writel(iisahb, s3c_idma.regs + S5P_IISAHB);
+}
+EXPORT_SYMBOL(s5p_i2s_idma_enable);
+
+void s5p_i2s_idma_pause(void)
+{
+	u32 val;
+
+	val  = readl(s3c_idma.regs + S5P_IISAHB);
+	val &= ~S5P_IISAHB_DMARLD;
+	writel(val, s3c_idma.regs + S5P_IISAHB);
+}
+EXPORT_SYMBOL(s5p_i2s_idma_pause);
+
+void s5p_i2s_idma_continue(void)
+{
+	u32 val;
+
+	val  = readl(s3c_idma.regs + S5P_IISAHB);
+	val |= S5P_IISAHB_DMARLD | S5P_IISAHB_DMAEN;
+	writel(val, s3c_idma.regs + S5P_IISAHB);
+}
+EXPORT_SYMBOL(s5p_i2s_idma_continue);
+
+void s5p_i2s_idma_stop(void)
+{
+	u32 val;
+
+	val  = readl(s3c_idma.regs + S5P_IISAHB);
+	val &= ~S5P_IISAHB_DMARLD;
+	writel(val, s3c_idma.regs + S5P_IISAHB);
+}
+EXPORT_SYMBOL(s5p_i2s_idma_stop);
+#endif	/* CONFIG_SND_S5P_RP */
 
 void s5p_idma_init(void *regs)
 {
 	spin_lock_init(&s3c_idma.lock);
 	s3c_idma.regs = regs;
 }
+
+struct snd_soc_platform idma_soc_platform = {
+	.name = "s5p-lp-audio",
+	.pcm_ops = &s3c_idma_ops,
+	.pcm_new = s3c_idma_pcm_new,
+	.pcm_free = s3c_idma_pcm_free,
+};
 
 MODULE_AUTHOR("Jaswinder Singh, jassi.brar@samsung.com");
 MODULE_DESCRIPTION("Samsung S5P LP-Audio DMA module");
