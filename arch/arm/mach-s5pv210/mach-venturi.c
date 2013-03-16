@@ -418,8 +418,7 @@ static struct s5p_media_device aries_media_devs[] = {
 };
 
 static struct regulator_consumer_supply ldo3_consumer[] = {
-	REGULATOR_SUPPLY("usb_io", NULL),
-	REGULATOR_SUPPLY("hdmi", NULL),
+	REGULATOR_SUPPLY("pd_io", "s3c-usbgadget")
 };
 
 static struct regulator_consumer_supply ldo5_consumer[] = {
@@ -431,7 +430,7 @@ static struct regulator_consumer_supply ldo7_consumer[] = {
 };
 
 static struct regulator_consumer_supply ldo8_consumer[] = {
-	REGULATOR_SUPPLY("usb_core", NULL),
+	REGULATOR_SUPPLY("pd_core", "s3c-usbgadget"),
 	REGULATOR_SUPPLY("tvout", NULL),
 };
 
