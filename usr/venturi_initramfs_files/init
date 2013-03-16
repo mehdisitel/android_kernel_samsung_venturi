@@ -45,8 +45,13 @@ umount /sys
 umount /proc
 date >> /boot.txt
 
+sleep 3
 mount -t vfat /dev/block/mmcblk0p17 /emmc/
+sleep 3
 cp /boot.txt /emmc/boot.txt
+sleep 3
+busybox dmesg > /emmc/logzzz/"$(date +%s)"
+sleep 3
 umount /emmc
 rm -rf /emmc
 
