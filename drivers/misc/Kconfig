@@ -578,6 +578,12 @@ config MODEM_HAS_CRAPPY_BOOTLOADER
 	  loading. This is a workaround for that, it only waits some
 	  time and tries to to continue.
 
+menuconfig VIBETONZ
+        tristate "Vibetonz"
+        default m
+        help
+          Say Y to enable Vibetonz support.
+
 config PN544
 	bool "NXP PN544 NFC Controller Driver"
 	default n
