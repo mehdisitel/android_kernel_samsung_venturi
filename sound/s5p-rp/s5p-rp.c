@@ -1431,7 +1431,7 @@ static struct file_operations s5p_rp_fops = {
 	.owner		= THIS_MODULE,
 	.read		= s5p_rp_read,
 	.write		= s5p_rp_write,
-	.ioctl		= s5p_rp_ioctl,
+	.unlocked_ioctl		= s5p_rp_ioctl,
 	.open		= s5p_rp_open,
 	.release	= s5p_rp_release,
 
@@ -1447,7 +1447,7 @@ static struct file_operations s5p_rp_ctrl_fops = {
 	.owner		= THIS_MODULE,
 	.read		= s5p_rp_ctrl_read,
 	.write		= s5p_rp_ctrl_write,
-	.ioctl		= s5p_rp_ctrl_ioctl,
+	.unlocked_ioctl		= s5p_rp_ctrl_ioctl,
 	.open		= s5p_rp_ctrl_open,
 	.release	= s5p_rp_ctrl_release,
 

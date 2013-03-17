@@ -80,7 +80,7 @@ static struct resource s5pv210_iis0_resource[] = {
 };
 
 struct platform_device s5pv210_device_iis0 = {
-	.name		  = "samsung-i2s",
+	.name		  = "s5pc1xx-iis",
 	.id		  = 0,
 	.num_resources	  = ARRAY_SIZE(s5pv210_iis0_resource),
 	.resource	  = s5pv210_iis0_resource,
@@ -122,7 +122,7 @@ static struct resource s5pv210_iis1_resource[] = {
 };
 
 struct platform_device s5pv210_device_iis1 = {
-	.name		  = "samsung-i2s",
+	.name		  = "s3c64xx-iis",
 	.id		  = 1,
 	.num_resources	  = ARRAY_SIZE(s5pv210_iis1_resource),
 	.resource	  = s5pv210_iis1_resource,
@@ -150,7 +150,7 @@ static struct resource s5pv210_iis2_resource[] = {
 };
 
 struct platform_device s5pv210_device_iis2 = {
-	.name		  = "samsung-i2s",
+	.name		  = "s3c64xx-iis",
 	.id		  = 2,
 	.num_resources	  = ARRAY_SIZE(s5pv210_iis2_resource),
 	.resource	  = s5pv210_iis2_resource,
@@ -361,3 +361,16 @@ struct platform_device s5pv210_device_spdif = {
 		.coherent_dma_mask = DMA_BIT_MASK(32),
 	},
 };
+
+#ifdef CONFIG_SND_S5P_RP
+static struct resource s5p_rp_resource[] = {
+};
+
+struct platform_device s5p_device_rp = {
+	.name           = "s5p-rp",
+	.id             = -1,
+	.num_resources  = ARRAY_SIZE(s5p_rp_resource),
+	.resource       = s5p_rp_resource,
+};
+EXPORT_SYMBOL(s5p_device_rp);
+#endif

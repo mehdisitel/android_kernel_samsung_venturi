@@ -734,7 +734,7 @@ CODECDBG("fmt=%d",fmt);    //yosef add
 static int mc1n2_i2s_set_clkdiv(struct snd_soc_dai *dai, int div_id, int div)
 {
 	struct snd_soc_codec *codec = dai->codec;
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	struct mc1n2_port_params *port = &mc1n2->port[dai->id];
 	CODECDBG("div_id= %d, div=%d", div_id, div);    //yosef add
 	switch (div_id) {
@@ -764,7 +764,7 @@ static int mc1n2_i2s_set_clkdiv(struct snd_soc_dai *dai, int div_id, int div)
 static int mc1n2_i2s_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 {
 	struct snd_soc_codec *codec = dai->codec;
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	struct mc1n2_port_params *port = &mc1n2->port[dai->id]; 
 
 	CODECDBG("fmt= %d", fmt);    //yosef add
@@ -796,7 +796,7 @@ static int mc1n2_i2s_hw_params(struct snd_pcm_substream *substream,
 #else
 	struct snd_soc_codec *codec = runtime->socdev->card->codec;
 #endif
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	struct mc1n2_port_params *port = &mc1n2->port[dai->id];
 	int dir = substream->stream;
 	int rate;
@@ -914,7 +914,7 @@ static int mc1n2_hw_free(struct snd_pcm_substream *substream,
 #else
 	struct snd_soc_codec *codec = runtime->socdev->card->codec;
 #endif
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	struct mc1n2_port_params *port = &mc1n2->port[dai->id];
 	int dir = substream->stream;
 	int err;
@@ -966,7 +966,7 @@ error:
 static int mc1n2_pcm_set_clkdiv(struct snd_soc_dai *dai, int div_id, int div)
 {
 	struct snd_soc_codec *codec = dai->codec;
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	struct mc1n2_port_params *port = &mc1n2->port[dai->id];
 
 	switch (div_id) {
@@ -1020,7 +1020,7 @@ static int mc1n2_pcm_set_clkdiv(struct snd_soc_dai *dai, int div_id, int div)
 static int mc1n2_pcm_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 {
 	struct snd_soc_codec *codec = dai->codec;
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	struct mc1n2_port_params *port = &mc1n2->port[dai->id];
  	/* format */
 	switch (fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
@@ -1047,7 +1047,7 @@ static int mc1n2_pcm_hw_params(struct snd_pcm_substream *substream,
 #else
 	struct snd_soc_codec *codec = runtime->socdev->card->codec;
 #endif
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	struct mc1n2_port_params *port = &mc1n2->port[dai->id];
 	int dir = substream->stream;
 	int rate;
@@ -1396,7 +1396,7 @@ unsigned int McDrv_Ctrl_fm( unsigned int volume )
 	MCDRV_VOL_INFO fm_vol;
 	MCDRV_PATH_INFO path;
 	struct snd_soc_codec *codec = mc1n2_get_codec_data(); // yosef added for FM noise
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);  // vol recovery test.
+	struct mc1n2_data *mc1n2 = codec->drvdata;  // vol recovery test.
 
 	fm_volume_backup = volume;
 	if(fmradio_state == 0)
@@ -1488,7 +1488,7 @@ void 	McDrv_Ctrl_MICBIAS2(int en )
 	int err;
 	MCDRV_PATH_INFO path;
 //	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-//	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+//	struct mc1n2_data *mc1n2 = codec->drvdata;
 
       if (MC1N2_VOIP_STATUS_DISCONNECT==mc1n2_voip_get_status())
       {
@@ -1553,7 +1553,7 @@ void 	McDrv_Ctrl_DNG_ctrl(int en , int path, int threshold)
 	int err;
 	MCDRV_DNG_INFO DNG_path;
 //	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-//	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+//	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 //================== yosef added for debugging
 	McResCtrl_GetDngInfo(&DNG_path);
@@ -1579,7 +1579,7 @@ EXPORT_SYMBOL(McDrv_Ctrl_DNG_ctrl);
 
 int mc1n2_set_path(struct snd_soc_codec *codec, MCDRV_PATH_INFO *info)
 {
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	MCDRV_CHANNEL *ch;
 	int i, j;
 
@@ -1864,7 +1864,7 @@ int mc1n2_write_reg(struct snd_soc_codec *codec,
 			   unsigned int reg, unsigned int value)
 {
 	u16 *cp;
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	MCDRV_VOL_INFO vol;
 
 	cp = (u16 *)codec->reg_cache + reg;
@@ -1995,7 +1995,7 @@ int mc1n2_write_reg(struct snd_soc_codec *codec,
 void mc1n2_set_analog_volume_hp(int index)
 {
     	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
     CODECDBG("set headphone analog volume=%d ,%d",index,gAnalVolHpIndex[index]);
     mc1n2_write_reg(codec, MC1N2_HEADPHONE_VOL_L, gAnalVolHpIndex[index]);
     mc1n2_write_reg(codec, MC1N2_HEADPHONE_VOL_R, gAnalVolHpIndex[index]);
@@ -2005,7 +2005,7 @@ void mc1n2_set_analog_volume_hp(int index)
 void mc1n2_set_analog_volume_spk(int index)
 {
     	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
     CODECDBG("set speaker analog volume=%d ,%d",index,gAnalVolSpeakerIndex[index]);
     mc1n2_write_reg(codec, MC1N2_SPEAKER_VOL_L, gAnalVolSpeakerIndex[index]);
     mc1n2_write_reg(codec, MC1N2_SPEAKER_VOL_R, gAnalVolSpeakerIndex[index]);   
@@ -2015,7 +2015,7 @@ void mc1n2_set_analog_volume_spk(int index)
 static int mc1n2_get_playback_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	ucontrol->value.integer.value[0] = mc1n2->playback_path;
 
@@ -2026,7 +2026,7 @@ static int mc1n2_set_playback_path(struct snd_kcontrol *kcontrol, struct snd_ctl
 {
 	int path_num = ucontrol->value.integer.value[0];
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	MCDRV_PATH_INFO path;
 	MCDRV_DIO_INFO diohdmi;
 	static MCDRV_DIO_INFO dioorg;
@@ -2423,7 +2423,7 @@ static int mc1n2_set_playback_path(struct snd_kcontrol *kcontrol, struct snd_ctl
 static int mc1n2_get_call_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	ucontrol->value.integer.value[0] = mc1n2->call_path;
 
@@ -2434,7 +2434,7 @@ static int mc1n2_set_call_path(struct snd_kcontrol *kcontrol, struct snd_ctl_ele
 {
 	int path_num = ucontrol->value.integer.value[0];
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	MCDRV_PATH_INFO path;
 
 #if 0
@@ -2601,7 +2601,7 @@ static int mc1n2_set_call_path(struct snd_kcontrol *kcontrol, struct snd_ctl_ele
 static int mc1n2_get_mic_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	ucontrol->value.integer.value[0] = mc1n2->mic_path;
 
@@ -2612,7 +2612,7 @@ static int mc1n2_set_mic_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem
 {
 	int path_num = ucontrol->value.integer.value[0];
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	MCDRV_PATH_INFO path;
 //	static int number_i =0;
 	
@@ -2736,7 +2736,7 @@ memset(&path, 0, sizeof(path));
 static int mc1n2_get_fmradio_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	ucontrol->value.integer.value[0] = mc1n2->fmr_path;
 
@@ -2747,7 +2747,7 @@ static int mc1n2_set_fmradio_path(struct snd_kcontrol *kcontrol, struct snd_ctl_
 {
 	int path_num = ucontrol->value.integer.value[0];
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	MCDRV_PATH_INFO path;
 	MCDRV_VOL_INFO vol;
 	SINT16 volume_restore,vol_count;
@@ -2956,7 +2956,7 @@ static int mc1n2_set_fmradio_path(struct snd_kcontrol *kcontrol, struct snd_ctl_
 static int mc1n2_fmradio_path_close(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	int control_data = ucontrol->value.integer.value[0];
 	int err;
 
@@ -3000,7 +3000,7 @@ static int mc1n2_fmradio_path_close(struct snd_kcontrol *kcontrol, struct snd_ct
 static int mc1n2_RECOGNITION_Set(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	MCDRV_PATH_INFO path;
 	MCDRV_VOL_INFO vol;
 	int control_data = ucontrol->value.integer.value[0];
@@ -3031,7 +3031,7 @@ static int mc1n2_RECOGNITION_Set(struct snd_kcontrol *kcontrol, struct snd_ctl_e
 static int mc1n2_get_codec_tuning(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	ucontrol->value.integer.value[0] = mc1n2->codec_tuning;
 
@@ -3042,7 +3042,7 @@ static int mc1n2_set_codec_tuning(struct snd_kcontrol *kcontrol, struct snd_ctl_
 {
 	int tuning = ucontrol->value.integer.value[0];
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	mc1n2->config_flag = tuning;
 
@@ -3055,7 +3055,7 @@ static int mc1n2_get_analog_volume(struct snd_kcontrol *kcontrol, struct snd_ctl
 {
 #ifndef DISABLE_ANALOG_VOLUME
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	ucontrol->value.integer.value[0] = mc1n2->analog_vol;
 #endif
@@ -3066,7 +3066,7 @@ static int mc1n2_set_analog_volume(struct snd_kcontrol *kcontrol, struct snd_ctl
 #ifndef DISABLE_ANALOG_VOLUME
 	int control_data = ucontrol->value.integer.value[0];
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
       CODECDBG("analog volume=%d current path =%d ", control_data, mc1n2->playback_path );
 
@@ -3097,7 +3097,7 @@ static int mc1n2_set_output_source(struct snd_kcontrol *kcontrol, struct snd_ctl
 static int mc1n2_get_codec_status(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	ucontrol->value.integer.value[0] = mc1n2->codec_status;
 
@@ -3109,7 +3109,7 @@ static int mc1n2_set_codec_status(struct snd_kcontrol *kcontrol, struct snd_ctl_
       gPathNum = control_data;
       
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	
 	CODECDBG("mc1n2_set_codec_status_entered %d ", control_data );   //yosef add
@@ -3252,7 +3252,7 @@ int audio_power(int en)
 	u32 val;
 
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 
 	CODECDBG("en= %d",en);
 	if(en)
@@ -3328,7 +3328,7 @@ static int mc1n2_probe(struct platform_device *pdev)
 {
 	struct snd_soc_device *socdev = platform_get_drvdata(pdev);
 	struct snd_soc_codec *codec = mc1n2_get_codec_data();
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	struct mc1n2_setup *setup = socdev->codec_data;
 //	MCDRV_REG_INFO info ;  // yosef added for HP amp test
 //	int reg_val; //yosef added for HP amp test
@@ -3594,7 +3594,7 @@ static int mc1n2_suspend(struct platform_device *pdev, pm_message_t state)
 #else
 	struct snd_soc_codec *codec = socdev->card->codec;
 #endif
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	int err, i;
 
 	TRACE_FUNC();
@@ -3649,7 +3649,7 @@ static int mc1n2_resume(struct platform_device *pdev)
 #else
 	struct snd_soc_codec *codec = socdev->card->codec;
 #endif
-	struct mc1n2_data *mc1n2 = snd_soc_codec_get_drvdata(codec);
+	struct mc1n2_data *mc1n2 = codec->drvdata;
 	SINT16 *vol = (SINT16 *)&mc1n2->vol_store;
 	int err, i;
 
@@ -3753,7 +3753,7 @@ static int mc1n2_i2c_probe(struct i2c_client *client,
 		goto err_alloc_data;
 	}
 	mutex_init(&mc1n2->mutex);
-	snd_soc_codec_get_drvdata(codec) = mc1n2;
+	codec->drvdata = mc1n2;
 
 	client->adapter = i2c_get_adapter(4);
 
@@ -3822,7 +3822,7 @@ static int mc1n2_i2c_remove(struct i2c_client *client)
 	TRACE_FUNC();
 
 	if (codec) {
-		mc1n2 = snd_soc_codec_get_drvdata(codec);
+		mc1n2 = codec->drvdata;
 		snd_soc_unregister_dais(mc1n2_dai, ARRAY_SIZE(mc1n2_dai));
 		snd_soc_unregister_codec(codec);
 
