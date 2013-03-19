@@ -625,6 +625,7 @@ int s5p_i2sv5_register_dai(struct snd_soc_dai *dai)
 	/* suspend/resume are not necessary due to Clock/Pwer gating scheme */
 	dai->suspend = s5p_i2s_suspend;
 	dai->resume = s5p_i2s_resume;
+	msleep(1500);
 	return snd_soc_register_dai(dai);
 }
 
