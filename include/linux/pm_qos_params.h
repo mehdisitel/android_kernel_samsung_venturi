@@ -16,7 +16,6 @@
 #define PM_QOS_NUM_CLASSES 4
 #define PM_QOS_DEFAULT_VALUE -1
 
-<<<<<<< HEAD
 #define PM_QOS_CPU_DMA_LAT_DEFAULT_VALUE	(2000 * USEC_PER_SEC)
 #define PM_QOS_NETWORK_LAT_DEFAULT_VALUE	(2000 * USEC_PER_SEC)
 #define PM_QOS_NETWORK_THROUGHPUT_DEFAULT_VALUE	0
@@ -26,13 +25,6 @@ struct pm_qos_request_list {
 	int pm_qos_class;
 };
 
-=======
-struct pm_qos_request_list {
-	struct plist_node list;
-	int pm_qos_class;
-};
-
->>>>>>> 82f6825... pm_qos: Get rid of the allocation in pm_qos_add_request()
 void pm_qos_add_request(struct pm_qos_request_list *l, int pm_qos_class, s32 value);
 void pm_qos_update_request(struct pm_qos_request_list *pm_qos_req,
 		s32 new_value);
