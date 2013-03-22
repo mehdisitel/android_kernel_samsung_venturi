@@ -32,8 +32,6 @@
 
 #include "s3c-dma.h"
 
-#define NEW_DMA
-
 static const struct snd_pcm_hardware s3c_dma_hardware = {
 	.info			= SNDRV_PCM_INFO_INTERLEAVED |
 				    SNDRV_PCM_INFO_BLOCK_TRANSFER |
@@ -90,14 +88,14 @@ static void s3c_dma_enqueue(struct snd_pcm_substream *substream)
 				__func__, prtd->dma_loaded, limit);
 
 	
-#ifdef NEW_DMA
+#if 0
 	ret = s3c2410_dma_enqueue_autoload (prtd->params->channel,
 		substream, pos, prtd->dma_period, limit);
 	if (ret == 0) {
 		prtd->dma_loaded += limit;
 		pos += prtd->dma_period;
 	}
-#else
+#endif
 	while (prtd->dma_loaded < limit) {
 		unsigned long len = prtd->dma_period;
 
@@ -120,7 +118,6 @@ static void s3c_dma_enqueue(struct snd_pcm_substream *substream)
 		} else
 			break;
 	}
-#endif
 	prtd->dma_pos = pos;
 }
 
@@ -144,7 +141,7 @@ static void s3c24xx_audio_buffdone(struct s3c2410_dma_chan *channel,
 	spin_lock(&prtd->lock);
 	if (prtd->state & ST_RUNNING && !s3c_dma_has_circular()) {
 		prtd->dma_loaded--;
-#ifndef NEW_DMA
+#if 1
 		s3c_dma_enqueue(substream);
 #endif
 	}

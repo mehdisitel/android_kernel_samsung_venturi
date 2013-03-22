@@ -660,6 +660,7 @@ ctrl_exit:
 }
 EXPORT_SYMBOL(s3c2410_dma_ctrl);
 
+#if 0
 int s3c2410_dma_enqueue_autoload(enum dma_ch id, void *token,
 			dma_addr_t addr, int size, int numofblock)
 {
@@ -729,6 +730,7 @@ enq_exit:
 
 	return ret;
 }
+#endif
 
 int s3c2410_dma_enqueue(enum dma_ch id, void *token,
 			dma_addr_t addr, int size)
