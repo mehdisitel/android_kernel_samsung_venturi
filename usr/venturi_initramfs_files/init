@@ -21,7 +21,7 @@ load_len=$boot_len
 
 mount -t ext4 /dev/block/mmcblk0p15 /cache
 
-if test -e /cache/.startrecovery || grep -q bootmode=2 /proc/cmdline ; then
+if test -e /cache/.startrecovery ; then
 	# recovery boot
 	rm -fr /cache/.startrecovery
 	load_offset=$recovery_offset
@@ -45,13 +45,8 @@ umount /sys
 umount /proc
 date >> /boot.txt
 
-sleep 3
 mount -t vfat /dev/block/mmcblk0p17 /emmc/
-sleep 3
 cp /boot.txt /emmc/boot.txt
-sleep 3
-busybox dmesg > /emmc/logzzz/"$(date +%s)"
-sleep 3
 umount /emmc
 rm -rf /emmc
 
