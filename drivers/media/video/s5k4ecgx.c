@@ -2334,10 +2334,10 @@ static int s5k4ecgx_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 	case V4L2_CID_CAMERA_CHECK_DATALINE_STOP:
 		err = s5k4ecgx_check_dataline_stop(sd);
 		break;
-	case V4L2_CID_CAMERA_RETURN_FOCUS:
-		if (parms->focus_mode != FOCUS_MODE_MACRO)
-			err = s5k4ecgx_return_focus(sd);
-		break;
+	//case V4L2_CID_CAMERA_RETURN_FOCUS:
+	//	if (parms->focus_mode != FOCUS_MODE_MACRO)
+	//		err = s5k4ecgx_return_focus(sd);
+	//	break;
 	case V4L2_CID_CAMERA_FINISH_AUTO_FOCUS:
 		err = s5k4ecgx_finish_auto_focus(sd);
 		break;
