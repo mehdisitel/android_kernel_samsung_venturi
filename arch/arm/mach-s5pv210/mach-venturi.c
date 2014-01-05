@@ -2535,7 +2535,7 @@ static struct s5k4ecgx_platform_data s5k4ecgx_plat = {
 	.default_height = 480,
 	.pixelformat = V4L2_PIX_FMT_UYVY,
 	.freq = 24000000,
-	.is_mipi = 0,
+	//.is_mipi = 0,
 	.flash_onoff = s5k4ecgx_flash,
 };
 
